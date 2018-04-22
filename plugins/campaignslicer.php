@@ -3,7 +3,7 @@
 class campaignslicer extends phplistPlugin {
     public $name = "Send to a subset of the total campaign";
     public $coderoot = '';
-    public $version = "0.1";
+    public $version = "0.2";
     public $authors = 'Michiel Dethmers';
     public $enabled = 1;
     public $description = 'Send to a maximum of subscribers in a campaign, instead of all';
@@ -11,6 +11,10 @@ class campaignslicer extends phplistPlugin {
     private $actions = array(
         'suspend' => 'Suspend',
         'marksent' => 'Mark as sent',
+    );
+    private $yesno = array(
+        'no' => 'No',
+        'yes' => 'Yes',
     );
 
     public function sendMessageTab($messageId = 0, $messageData = array()) {
@@ -24,11 +28,20 @@ class campaignslicer extends phplistPlugin {
             $actionHTML .= '>'.s($val).'</option>';
         }
         $actionHTML .= '</select>';
+        $randomHTML = '<select name="campaignslicer_random">';
+        foreach ($this->yesno as $key => $val) {
+            $randomHTML .= sprintf('<option value="%s" ',$key);
+            if ($messageData['campaignslicer_random'] == $key) {
+                $randomHTML .= 'selected="selected" ';
+            }
+            $randomHTML .= '>'.s($val).'</option>';
+        }
+        $randomHTML .= '</select>';
 
         $html = sprintf('
             <table>
             <tr>
-                <td>'.s('Maximum subscribers to send').'<br/>'.s('Use 0 to send to all').'</td>
+                <td>'.s('Maximum subscribers to send').'<br/><p class="small">'.s('Use 0 to send to all').'</p></td>
                 <td><input type="text" name="%s_max" value="%d" /></td>
             </tr>
             <tr>
@@ -36,7 +49,12 @@ class campaignslicer extends phplistPlugin {
 
                 <td>%s</td>
             </tr>
-            </table>','campaignslicer',$messageData['campaignslicer_max'],$actionHTML);
+            <tr>
+                <td>'.s('Randomize the subscribers').'<br/><p class="small">'.s('This will slow down the sending process').'</p></td>
+
+                <td>%s</td>
+            </tr>
+            </table>','campaignslicer',$messageData['campaignslicer_max'],$actionHTML,$randomHTML);
 
         return $html;
     }
@@ -58,7 +76,7 @@ class campaignslicer extends phplistPlugin {
             $messageData['astextandpdf'] +
             $messageData['counters']['sent_users_for_message '.$messageData['id']];
 
-        if ($totalsent >= $messageData['campaignslicer_max']) {
+        if ($totalsent >= $max) {
             switch ($messageData['campaignslicer_action']) {
                 case 'marksent':
                     Sql_query(sprintf('update %s set status = "sent" where id = %d',$GLOBALS['tables']['message'], $messageData['id']));
@@ -73,6 +91,15 @@ class campaignslicer extends phplistPlugin {
 
             return true;
         }
+        if ($messageData['campaignslicer_random'] == 'yes') {
+            $segmentSize = (int) ($messageData['counters']['total_users_for_message '.$messageData['id']] / $max);
+            if (rand(1,$segmentSize) == 1) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
         return false;
     }
 
