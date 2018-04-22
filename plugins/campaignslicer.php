@@ -106,7 +106,7 @@ class campaignslicer extends phplistPlugin {
     public function dependencyCheck() {
         global $plugins;
         return array(
-            'phpList version 3.2.4 or later' => version_compare(VERSION, '3.2.3') > 0,
+            'phpList version 3.3.3 or later' => version_compare(VERSION, '3.3.3') > 0,
         );
     }
 }
