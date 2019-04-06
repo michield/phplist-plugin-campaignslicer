@@ -64,6 +64,13 @@ class campaignslicer extends phplistPlugin {
         return s('Slice');
     }
 
+    public function viewMessage($messageID,$messageData) {
+        $key = s('Maximum slice').'<br/>'.s('Action when reached');
+        $val = $messageData['campaignslicer_max'].'<br/>'.
+        $messageData['campaignslicer_action'];
+        return array($key,$val);
+    }
+
     public function throttleSend($messageData, $userData)
     {
         $max = (int) $messageData['campaignslicer_max'];
