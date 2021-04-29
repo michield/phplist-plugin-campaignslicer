@@ -1,5 +1,5 @@
 {
-    "name": "phplist/phplist-plugin-campaignslicer",
+    "name": "michield/phplist-plugin-campaignslicer",
     "description": "Campaign slicer plugin for phpList",
     "keywords": [
       "phplist",
