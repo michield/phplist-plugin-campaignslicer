@@ -22,7 +22,7 @@ class campaignslicer extends phplistPlugin {
         $actionHTML = '<select name="campaignslicer_action">';
         foreach ($this->actions as $key => $val) {
             $actionHTML .= sprintf('<option value="%s" ',$key);
-            if ($messageData['campaignslicer_action'] == $key) {
+            if (isset($messageData['campaignslicer_action']) && $messageData['campaignslicer_action'] == $key) {
                 $actionHTML .= 'selected="selected" ';
             }
             $actionHTML .= '>'.s($val).'</option>';
@@ -31,7 +31,7 @@ class campaignslicer extends phplistPlugin {
         $randomHTML = '<select name="campaignslicer_random">';
         foreach ($this->yesno as $key => $val) {
             $randomHTML .= sprintf('<option value="%s" ',$key);
-            if ($messageData['campaignslicer_random'] == $key) {
+            if (isset($messageData['campaignslicer_random']) && $messageData['campaignslicer_random'] == $key) {
                 $randomHTML .= 'selected="selected" ';
             }
             $randomHTML .= '>'.s($val).'</option>';
@@ -54,7 +54,7 @@ class campaignslicer extends phplistPlugin {
 
                 <td>%s</td>
             </tr>
-            </table>','campaignslicer',$messageData['campaignslicer_max'],$actionHTML,$randomHTML);
+            </table>','campaignslicer',isset($messageData['campaignslicer_max']) ? $messageData['campaignslicer_max']:'',$actionHTML,$randomHTML);
 
         return $html;
     }
@@ -64,7 +64,8 @@ class campaignslicer extends phplistPlugin {
         return s('Slice');
     }
 
-    public function viewMessage($messageID,$messageData) {
+    public function viewMessage($messageid, array $messagedata) 
+    {
         $key = s('Maximum slice').'<br/>'.s('Action when reached');
         $val = $messageData['campaignslicer_max'].'<br/>'.
         $messageData['campaignslicer_action'];
